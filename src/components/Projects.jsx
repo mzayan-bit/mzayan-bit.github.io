@@ -3,93 +3,80 @@ import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 
 const projects = [
   {
-    name: "AI Gym Vision",
-    description: "Computer vision fitness assistant using MediaPipe & YOLO to track human pose and calculate joint angles for form correction.",
-    tags: [
-      { name: "python", color: "text-blue-500" },
-      { name: "mediapipe", color: "text-green-500" },
-      { name: "opencv", color: "text-pink-500" },
-    ],
-    image: "mzayan-bit.github.io\portfolio\images\ai_gym.png", // Replace with screenshot
-    source_code_link: "https://github.com/mzayan-bit/AI_Gym_Vision",
+    title: "AI Gym Vision",
+    tech: ["Python", "MediaPipe", "YOLO"],
+    desc: "Computer vision assistant tracking human pose and calculating joint angles for real-time form correction.",
+    link: "https://github.com/mzayan-bit/AI_Gym_Vision",
+    img: "/images/ai_gym.png" 
   },
   {
-    name: "Roomify",
-    description: "Django-based roommate matching platform utilizing a Hybrid AI engine (Heuristic + Scikit-Learn) for 85% match quality.",
-    tags: [
-      { name: "django", color: "text-green-500" },
-      { name: "scikit-learn", color: "text-orange-500" },
-      { name: "sql", color: "text-blue-400" },
-    ],
-    image: "mzayan-bit.github.io\portfolio\images\roomify.png", // Replace with screenshot
-    source_code_link: "https://github.com/mzayan-bit/Roomify",
+    title: "Roomify",
+    tech: ["Django", "Scikit-Learn", "PostgreSQL"],
+    desc: "Roommate matching platform utilizing a Hybrid AI engine (Heuristic + ML) achieving 85% match quality.",
+    link: "https://github.com/mzayan-bit/Roomify",
+    img: "/images/roomify.png"
   },
   {
-    name: "HabitFlow",
-    description: "Mobile habit-tracking app built with Flutter featuring offline-first local storage, streak mechanics, and data visualization.",
-    tags: [
-      { name: "flutter", color: "text-blue-400" },
-      { name: "dart", color: "text-blue-600" },
-      { name: "ui/ux", color: "text-pink-500" },
-    ],
-    image: "mzayan-bit.github.io\portfolio\images\habitflow.png", // Replace with screenshot
-    source_code_link: "https://github.com/mzayan-bit/habitflow-app",
-  },
+    title: "HabitFlow",
+    tech: ["Flutter", "Dart", "Local Storage"],
+    desc: "Offline-first mobile habit tracker featuring streak mechanics, data viz, and user retention systems.",
+    link: "https://github.com/mzayan-bit/habitflow-app",
+    img: "/images/habitflow.png"
+  }
 ];
-
-const ProjectCard = ({ index, name, description, tags, image, source_code_link }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.2 }}
-      className="glass p-5 rounded-2xl sm:w-[360px] w-full transform hover:scale-105 transition-all duration-300"
-    >
-      <div className="relative w-full h-[230px]">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover rounded-2xl"
-        />
-        <div className="absolute inset-0 flex justify-end m-3 card-img_hover">
-          <div
-            onClick={() => window.open(source_code_link, "_blank")}
-            className="black-gradient w-10 h-10 rounded-full flex justify-center items-center cursor-pointer bg-black/80 hover:bg-neon-blue transition-colors"
-          >
-            <FaGithub className="w-1/2 h-1/2 text-white" />
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-5">
-        <h3 className="text-white font-bold text-[24px] text-glow">{name}</h3>
-        <p className="mt-2 text-secondary text-[14px]">{description}</p>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {tags.map((tag) => (
-          <p key={tag.name} className={`text-[14px] ${tag.color}`}>
-            #{tag.name}
-          </p>
-        ))}
-      </div>
-    </motion.div>
-  );
-};
 
 const Projects = () => {
   return (
-    <section id="projects" className="py-20 px-6 max-w-7xl mx-auto">
-      <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}>
-        <p className="text-[18px] text-secondary uppercase tracking-wider">My Work</p>
-        <h2 className="text-white font-black md:text-[60px] sm:text-[50px] xs:text-[40px] text-[30px]">
-          Projects.
-        </h2>
-      </motion.div>
+    <section id="projects" className="py-24 px-6 max-w-7xl mx-auto">
+      <div className="mb-16">
+        <h2 className="text-4xl font-bold mb-4">Selected Works</h2>
+        <div className="h-1 w-24 bg-gradient-to-r from-neon-blue to-neon-purple rounded-full"></div>
+      </div>
 
-      <div className="mt-20 flex flex-wrap gap-7 justify-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {projects.map((project, index) => (
-          <ProjectCard key={`project-${index}`} index={index} {...project} />
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            viewport={{ once: true }}
+            className="glass group relative rounded-2xl overflow-hidden hover:shadow-neon-soft transition-all duration-300"
+          >
+            {/* Image Area */}
+            <div className="h-[220px] w-full overflow-hidden relative">
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all z-10"/>
+              <img 
+                src={project.img} 
+                alt={project.title} 
+                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" 
+              />
+            </div>
+
+            {/* Content Area */}
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-bold text-white group-hover:text-neon-blue transition-colors">
+                  {project.title}
+                </h3>
+                <a href={project.link} target="_blank" className="text-muted hover:text-white">
+                  <FaGithub size={22} />
+                </a>
+              </div>
+              
+              <p className="text-muted text-sm mb-6 leading-relaxed">
+                {project.desc}
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                {project.tech.map((t) => (
+                  <span key={t} className="text-xs font-mono text-neon-purple bg-neon-purple/10 px-2 py-1 rounded border border-neon-purple/20">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         ))}
       </div>
     </section>
