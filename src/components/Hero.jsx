@@ -62,7 +62,8 @@ const Hero = () => {
           <img 
             src="/me.png" 
             alt="Muhammad Zayan" 
-            className="w-full h-full object-cover object-top rounded-full border-4 border-neon-blue/20 hover:border-neon-blue transition-colors duration-500"
+            className="w-full h-full object-cover rounded-full border-4 border-neon-blue/20 hover:border-neon-blue transition-colors duration-500"
+            style={{ objectPosition: "50% 30%" }}
           />
         </div>
       </motion.div>

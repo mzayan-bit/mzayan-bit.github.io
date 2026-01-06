@@ -18,7 +18,7 @@ const Contact = () => {
         </p>
 
         {/* Replace YOUR_FORMSPREE_ID with your actual ID */}
-        <form action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" className="max-w-md mx-auto space-y-4 text-left">
+        <form action="https://formspree.io/f/xbdlvber" method="POST" className="max-w-md mx-auto space-y-4 text-left">
           <div>
             <label className="text-sm font-medium text-muted block mb-2">Name</label>
             <input type="text" name="name" required className="w-full bg-card border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-neon-blue transition-colors" />
