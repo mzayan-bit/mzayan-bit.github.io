@@ -5,9 +5,9 @@
 @tailwind utilities;
 
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: 10px;
+  --glass-bg: rgba(10, 16, 34, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-blur: 16px;
 }
 
 html {
@@ -17,7 +17,56 @@ html {
 
 body {
   @apply bg-bg text-white font-sans antialiased overflow-x-hidden;
-  background-image: linear-gradient(180deg, rgba(5,8,22,1) 0%, rgba(2,6,16,1) 100%);
+  background-color: #050816;
+}
+
+/* Base Typography */
+h1 {
+  font-size: clamp(3rem, 8vw, 6rem); /* 48px to 96px */
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+h2 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.subheadline {
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.5;
+}
+.body-text {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.6;
+}
+
+/* --- AMBIENT BACKGROUNDS --- */
+.bg-noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+}
+
+.bg-ai-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* --- THE GLASS CLASS --- */
@@ -30,8 +79,11 @@ body {
 }
 
 /* Neon Glow Utility */
-.text-glow {
-  text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+.text-glow-cyan {
+  text-shadow: 0 0 15px rgba(0, 229, 255, 0.8);
+}
+.text-glow-purple {
+  text-shadow: 0 0 15px rgba(124, 58, 237, 0.8);
 }
 
 /* Custom Scrollbar */
@@ -42,9 +94,9 @@ body {
   background: #050816;
 }
 ::-webkit-scrollbar-thumb {
-  background: #151030;
+  background: #0A1022;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f3ff;
+  background: #00E5FF;
 }
