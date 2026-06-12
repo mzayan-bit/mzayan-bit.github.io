@@ -1,238 +1,199 @@
-import { useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
-import { FaGithub } from "react-icons/fa";
-import anime from "animejs";
-import { useTiltCard, prefersReducedMotion, TIMING, EASE } from "../hooks/useMotion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { FaGithub, FaTimes } from "react-icons/fa";
+import { prefersReducedMotion } from "../hooks/useMotion";
 
 const projects = [
   {
+    id: "visiontraceai",
     title: "VisionTraceAI",
     tech: ["React", "FastAPI", "Kafka", "YOLO11", "LangGraph"],
     desc: "Event-driven video analytics platform featuring cross-camera tracking, zero-shot semantic search, and an autonomous agent.",
+    challenges: "Architecting a low-latency streaming pipeline that could handle multiple video feeds concurrently without bottlenecking the inference engine. Ensuring the LangGraph autonomous agent could reason accurately over sparse metadata.",
+    outcomes: "Achieved sub-100ms latency for real-time tracking across 4+ simulated camera feeds. Deployed a scalable microservices architecture using Kafka for robust message passing.",
     link: "https://github.com/mzayan-bit/VisionTraceAI",
     img: "/images/visiontraceai.png",
   },
   {
+    id: "aigymvision",
     title: "AI Gym Vision",
     tech: ["Python", "MediaPipe", "OpenCV"],
     desc: "Computer vision assistant tracking human pose and calculating joint angles for real-time form correction.",
+    challenges: "Extracting stable 3D coordinates from a 2D webcam feed and mathematically filtering noisy keypoints during rapid movements like squats and deadlifts.",
+    outcomes: "Built a localized, lightweight inference pipeline running entirely on the CPU, achieving 30+ FPS while providing immediate visual feedback on exercise form.",
     link: "https://github.com/mzayan-bit/AI_Gym_Vision",
     img: "/images/ai_gym.png",
   },
   {
+    id: "matchmaker",
     title: "Matchmaker & Classification Engine",
     tech: ["Python", "Scikit-Learn", "Pandas", "TF-IDF"],
     desc: "IPO recommendation engine and KNN classification model utilizing TF-IDF vectorization to map user skill profiles.",
+    challenges: "Handling highly sparse text data from raw resumes and optimizing the K-Nearest Neighbors search space for real-time matchmaking responses.",
+    outcomes: "Developed a robust NLP pipeline that accurately matched candidate profiles to job descriptions, significantly reducing manual screening time for HR teams.",
     link: "https://github.com/mzayan-bit/Decode_Labs_Internship",
     img: "/images/decodelab.png",
   },
   {
+    id: "roomify",
     title: "Roomify",
     tech: ["Django", "Scikit-Learn", "PostgreSQL"],
     desc: "Roommate matching platform utilizing a Hybrid AI engine (Heuristic + ML) achieving 85% match quality.",
+    challenges: "Designing an algorithm that could balance hard constraints (e.g., budget, location) with soft preferences (e.g., cleanliness, lifestyle) without generating zero matches.",
+    outcomes: "Deployed a full-stack Django application with an optimized PostgreSQL schema, delivering highly relevant roommate suggestions verified through user feedback loops.",
     link: "https://github.com/mzayan-bit/Roomify",
     img: "/images/roomify.png",
   },
   {
+    id: "habitflow",
     title: "HabitFlow",
     tech: ["Flutter", "Dart", "Local Storage"],
     desc: "Offline-first mobile habit tracker featuring streak mechanics, data viz, and user retention systems.",
+    challenges: "Implementing a reliable offline-first architecture that handles local storage persistence securely, while ensuring complex streak logic calculates correctly across different timezones.",
+    outcomes: "Launched a highly responsive, cross-platform mobile application with fluid animations, intuitive data visualization, and an engaging gamified user experience.",
     link: "https://github.com/mzayan-bit/habitflow-app",
     img: "/images/habitflow.png",
   },
 ];
 
-/* ─── Individual Project Card with 3D tilt ─── */
-const ProjectCard = ({ project, index }) => {
+/* ─── Individual Project Card with 3D tilt & Spotlight ─── */
+const ProjectCard = ({ project, setActiveProject }) => {
   const cardRef = useRef(null);
+  
+  // Framer Motion values for 3D tilt
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el || prefersReducedMotion()) return;
+  // Mouse position for spotlight
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
-    const maxTilt = 6;
+  // Smooth springs for tilt
+  const springConfig = { damping: 25, stiffness: 150, mass: 0.5 };
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [6, -6]), springConfig);
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-6, 6]), springConfig);
 
-    const handleMove = (e) => {
-      const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
-      const tiltX = (y - 0.5) * -maxTilt;
-      const tiltY = (x - 0.5) * maxTilt;
+  const handleMouseMove = (e) => {
+    if (!cardRef.current || prefersReducedMotion()) return;
 
-      anime({
-        targets: el,
-        rotateX: tiltX,
-        rotateY: tiltY,
-        translateY: -12,
-        duration: TIMING.MEDIUM,
-        easing: EASE.out,
-      });
+    const rect = cardRef.current.getBoundingClientRect();
+    
+    const clientX = e.clientX - rect.left;
+    const clientY = e.clientY - rect.top;
 
-      // Move glow direction
-      const glowEl = el.querySelector("[data-glow]");
-      if (glowEl) {
-        glowEl.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(0,229,255,0.12), transparent 60%)`;
-      }
+    // Calculate normalized coordinates (-0.5 to 0.5)
+    const normalizedX = (clientX / rect.width) - 0.5;
+    const normalizedY = (clientY / rect.height) - 0.5;
 
-      // Zoom image
-      const img = el.querySelector("[data-card-img]");
-      if (img) {
-        anime({
-          targets: img,
-          scale: 1.05,
-          duration: TIMING.MEDIUM,
-          easing: EASE.out,
-        });
-      }
-    };
+    x.set(normalizedX);
+    y.set(normalizedY);
+    
+    // Update spotlight position
+    mouseX.set(clientX);
+    mouseY.set(clientY);
+  };
 
-    const handleLeave = () => {
-      anime({
-        targets: el,
-        rotateX: 0,
-        rotateY: 0,
-        translateY: 0,
-        duration: TIMING.LARGE,
-        easing: EASE.spring,
-      });
-
-      const glowEl = el.querySelector("[data-glow]");
-      if (glowEl) glowEl.style.background = "transparent";
-
-      const img = el.querySelector("[data-card-img]");
-      if (img) {
-        anime({
-          targets: img,
-          scale: 1,
-          duration: TIMING.LARGE,
-          easing: EASE.out,
-        });
-      }
-    };
-
-    // Stagger tags on hover
-    const handleEnter = () => {
-      const tags = el.querySelectorAll("[data-tag]");
-      anime({
-        targets: tags,
-        scale: [0.9, 1],
-        opacity: [0.5, 1],
-        delay: anime.stagger(40),
-        duration: TIMING.MEDIUM,
-        easing: EASE.out,
-      });
-    };
-
-    el.addEventListener("mousemove", handleMove);
-    el.addEventListener("mouseleave", handleLeave);
-    el.addEventListener("mouseenter", handleEnter);
-    return () => {
-      el.removeEventListener("mousemove", handleMove);
-      el.removeEventListener("mouseleave", handleLeave);
-      el.removeEventListener("mouseenter", handleEnter);
-    };
-  }, []);
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
-    <div
+    <motion.div
       ref={cardRef}
-      data-project-card
-      className="group relative rounded-3xl overflow-hidden glass hover:shadow-neon-cyan transition-shadow duration-500 bg-card/60 border border-white/5"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={() => setActiveProject(project)}
+      layoutId={`card-${project.id}`}
+      className="group relative rounded-3xl overflow-hidden glass cursor-pointer transition-shadow duration-500 bg-card/60 border border-white/5 hover:border-white/10"
       style={{
-        perspective: "1000px",
+        rotateX,
+        rotateY,
         transformStyle: "preserve-3d",
-        opacity: 0,
-        transform: "translateY(40px)",
       }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ scale: 0.98, translateY: -8 }}
     >
-      {/* Dynamic glow overlay */}
-      <div
-        data-glow
-        className="absolute inset-0 z-20 pointer-events-none transition-all duration-300 rounded-3xl"
+      {/* Spotlight effect */}
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"
+        style={{
+          background: useTransform(
+            [mouseX, mouseY],
+            ([mx, my]) => `radial-gradient(600px circle at ${mx}px ${my}px, rgba(255,255,255,0.06), transparent 40%)`
+          ),
+        }}
       />
 
       {/* Image Area */}
-      <div className="h-[240px] w-full overflow-hidden relative z-10">
-        <div className="absolute inset-0 bg-card/40 group-hover:bg-transparent transition-all duration-500 z-10" />
-        <img
-          data-card-img
-          data-parallax="0.03"
+      <motion.div 
+        layoutId={`image-${project.id}`}
+        className="h-[240px] w-full overflow-hidden relative z-10"
+      >
+        <div className="absolute inset-0 bg-card/20 group-hover:bg-transparent transition-all duration-500 z-10" />
+        <motion.img
           src={project.img}
           alt={project.title}
-          className="w-full h-full object-cover will-change-transform"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          style={{ transform: "translateZ(30px)" }}
         />
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-card/90 to-transparent z-10"></div>
-      </div>
+      </motion.div>
 
       {/* Content Area */}
-      <div className="p-8 relative z-10 -mt-6">
+      <div 
+        className="p-8 relative z-10 -mt-6 transform-gpu"
+        style={{ transform: "translateZ(40px)" }}
+      >
         <div className="flex justify-between items-start mb-4">
-          <h3 className="text-2xl font-bold text-white group-hover:text-neon-cyan transition-colors duration-300">
-            {project.title}
-          </h3>
-          <a
-            href={project.link}
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted hover:text-neon-cyan transition-colors mt-1 icon-hover"
+          <motion.h3 
+            layoutId={`title-${project.id}`}
+            className="text-2xl font-bold text-white transition-colors duration-300 group-hover:translate-x-1 group-hover:text-white"
           >
-            <FaGithub size={24} />
-          </a>
+            {project.title}
+          </motion.h3>
         </div>
 
-        <p className="text-muted text-sm mb-8 leading-relaxed font-light">
+        <motion.p 
+          layoutId={`desc-${project.id}`}
+          className="text-muted text-sm mb-8 leading-relaxed font-light line-clamp-2"
+        >
           {project.desc}
-        </p>
+        </motion.p>
 
-        <div className="flex flex-wrap gap-2">
+        <motion.div layoutId={`tech-${project.id}`} className="flex flex-wrap gap-2 group-hover:translate-y-[-2px] transition-transform duration-500">
           {project.tech.map((t) => (
             <span
               key={t}
-              data-tag
-              className="text-xs font-mono font-medium text-neon-cyan bg-neon-cyan/5 px-3 py-1.5 rounded-full border border-neon-cyan/20 group-hover:border-neon-cyan/40 transition-colors"
+              className="text-xs font-mono font-medium text-white/70 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 group-hover:border-white/20 group-hover:text-white transition-colors"
             >
               {t}
             </span>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 /* ─── Projects Section ─── */
 const Projects = () => {
-  const gridRef = useRef(null);
-  const hasRevealed = useRef(false);
+  const [activeProject, setActiveProject] = useState(null);
 
-  // Stagger reveal with anime.js
+  // Lock body scroll when modal is open
   useEffect(() => {
-    if (prefersReducedMotion() || hasRevealed.current) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasRevealed.current) {
-            hasRevealed.current = true;
-            const cards = entry.target.querySelectorAll("[data-project-card]");
-            anime({
-              targets: cards,
-              opacity: [0, 1],
-              translateY: [40, 0],
-              delay: anime.stagger(80),
-              duration: TIMING.LARGE,
-              easing: EASE.out,
-            });
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (gridRef.current) observer.observe(gridRef.current);
-    return () => observer.disconnect();
-  }, []);
+    if (activeProject) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [activeProject]);
 
   return (
     <section id="projects" className="relative py-32 px-6 max-w-7xl mx-auto z-10">
@@ -240,29 +201,155 @@ const Projects = () => {
       <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[60vw] h-[40vh] bg-neon-purple/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
       <div className="mb-20 relative">
-        <h2
-          data-mask-reveal
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight"
         >
           Selected Works
-        </h2>
+        </motion.h2>
         <motion.div
           initial={{ width: 0 }}
           whileInView={{ width: "120px" }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="h-1 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-full shadow-neon-cyan"
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="h-1 bg-gradient-to-r from-white/20 to-white/5 rounded-full shadow-glass-inset"
         />
       </div>
 
-      <div
-        ref={gridRef}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
-      >
-        {projects.map((project, index) => (
-          <ProjectCard key={index} project={project} index={index} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+        {projects.map((project) => (
+          <ProjectCard key={project.id} project={project} setActiveProject={setActiveProject} />
         ))}
       </div>
+
+      {/* Cinematic Modal */}
+      <AnimatePresence>
+        {activeProject && (
+          <>
+            {/* Backdrop Blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed inset-0 z-50 bg-bg/80 backdrop-blur-xl"
+              onClick={() => setActiveProject(null)}
+            />
+
+            {/* Modal Container */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-12 pointer-events-none">
+              <motion.div
+                layoutId={`card-${activeProject.id}`}
+                className="w-full max-w-5xl max-h-full overflow-y-auto bg-card rounded-3xl border border-white/10 shadow-2xl pointer-events-auto flex flex-col custom-scrollbar"
+                style={{ scrollbarWidth: "thin" }}
+              >
+                {/* Header Image */}
+                <div className="relative h-64 md:h-96 w-full flex-shrink-0">
+                  <motion.img
+                    layoutId={`image-${activeProject.id}`}
+                    src={activeProject.img}
+                    alt={activeProject.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+                  
+                  {/* Close Button */}
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={() => setActiveProject(null)}
+                    className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-colors border border-white/10"
+                  >
+                    <FaTimes />
+                  </motion.button>
+                </div>
+
+                {/* Modal Content */}
+                <div className="p-8 md:p-12 -mt-20 relative z-10 flex-grow">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                    <div>
+                      <motion.h3 
+                        layoutId={`title-${activeProject.id}`}
+                        className="text-4xl md:text-5xl font-bold text-white mb-6"
+                      >
+                        {activeProject.title}
+                      </motion.h3>
+                      <motion.div layoutId={`tech-${activeProject.id}`} className="flex flex-wrap gap-2">
+                        {activeProject.tech.map((t) => (
+                          <span
+                            key={t}
+                            className="text-sm font-mono font-medium text-white/80 bg-white/5 px-4 py-2 rounded-full border border-white/10"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </motion.div>
+                    </div>
+                    
+                    <motion.a
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      href={activeProject.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-3 px-8 py-4 bg-white text-bg font-semibold rounded-full hover:bg-white/90 transition-colors shadow-lg"
+                    >
+                      <FaGithub size={20} />
+                      View Repository
+                    </motion.a>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="md:col-span-1"
+                    >
+                      <h4 className="text-lg font-semibold text-white mb-4">Overview</h4>
+                      <motion.p 
+                        layoutId={`desc-${activeProject.id}`}
+                        className="text-muted leading-relaxed font-light"
+                      >
+                        {activeProject.desc}
+                      </motion.p>
+                    </motion.div>
+
+                    <div className="md:col-span-2 space-y-12">
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <h4 className="text-lg font-semibold text-white mb-4">The Challenge</h4>
+                        <p className="text-muted leading-relaxed font-light">
+                          {activeProject.challenges}
+                        </p>
+                      </motion.div>
+                      
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        <h4 className="text-lg font-semibold text-white mb-4">Outcomes</h4>
+                        <p className="text-muted leading-relaxed font-light">
+                          {activeProject.outcomes}
+                        </p>
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
