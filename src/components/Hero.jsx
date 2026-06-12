@@ -1,21 +1,8 @@
 import { useEffect, useRef, useMemo } from "react";
 import { Typewriter } from "react-simple-typewriter";
+import { motion } from "framer-motion";
 import { runHeroSequence, useMagnetic, prefersReducedMotion } from "../hooks/useMotion";
 import anime from "animejs";
-
-/* Split text into individually animatable characters */
-const SplitText = ({ text, className = "" }) => {
-  const chars = text.split("");
-  return (
-    <span className={className}>
-      {chars.map((char, i) => (
-        <span key={i} className="char inline-block" style={{ opacity: 0 }}>
-          {char === " " ? "\u00A0" : char}
-        </span>
-      ))}
-    </span>
-  );
-};
 
 const Hero = () => {
   const hasAnimated = useRef(false);
@@ -115,76 +102,52 @@ const Hero = () => {
       </div>
 
       {/* Left: Text Content */}
-      <div className="flex-1 space-y-6 z-10">
-        {/* Badge */}
-        <div
-          data-hero-badge
-          data-hero-animate
-          className="inline-block px-4 py-1.5 rounded-full border border-neon-cyan/30 bg-neon-cyan/10 text-neon-cyan text-xs font-bold tracking-[0.2em] mb-2 shadow-[0_0_15px_rgba(0,229,255,0.2)]"
-          style={{ opacity: 0 }}
-        >
-          <span className="animate-pulse mr-2">●</span> OPEN TO WORK
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="flex-1 flex flex-col justify-center space-y-4 z-10"
+      >
+        {/* Pre-heading: Small Label */}
+        <div className="text-xs md:text-sm font-semibold text-muted tracking-[0.2em] uppercase">
+          MUHAMMAD ZAYAN
         </div>
 
-        {/* Name — character-by-character reveal */}
-        <h1
-          data-hero-name
-          data-hero-animate
-          className="font-extrabold leading-tight"
-        >
-          <span className="text-white">
-            <SplitText text="Hi, I'm " />
-          </span>
-          <br className="hidden md:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple">
-            <SplitText text="Muhammad Zayan" />
-          </span>
-        </h1>
-
-        {/* Typewriter */}
-        <div
-          data-hero-desc
-          data-hero-animate
-          className="subheadline text-muted font-light h-12 flex items-center"
-          style={{ opacity: 0 }}
-        >
-          <span>I build&nbsp;</span>
-          <span className="text-white font-semibold text-glow-cyan">
+        {/* Main Heading */}
+        <h1 className="text-[42px] md:text-[56px] lg:text-[64px] font-extrabold leading-[1.1] tracking-tight text-white">
+          <span className="block mb-1">Hi, I'm</span>
+          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple drop-shadow-[0_0_20px_rgba(0,229,255,0.25)] pb-2 min-h-[95px] md:min-h-[125px] lg:min-h-[145px]">
             <Typewriter
               words={[
-                "Computer Vision Systems",
-                "Full Stack Apps",
-                "AI Models",
+                "Computer Vision Engineer",
+                "AI Engineer",
+                "Machine Learning Developer",
+                "Intelligent Systems Builder",
+                "AI Application Developer"
               ]}
               loop={0}
               cursor
               cursorStyle="_"
-              typeSpeed={80}
-              deleteSpeed={50}
-              delaySpeed={1500}
+              typeSpeed={50}
+              deleteSpeed={30}
+              delaySpeed={2000}
             />
           </span>
-        </div>
+        </h1>
 
         {/* Description */}
-        <p
-          data-hero-desc
-          data-hero-animate
-          className="body-text text-muted max-w-lg leading-relaxed font-light"
-          style={{ opacity: 0 }}
-        >
+        <p className="text-[16px] md:text-[18px] text-muted max-w-lg leading-relaxed font-light mt-4">
           Turning data into decisions at{" "}
           <b className="text-white">GIKI</b>. I engineer accessible, inclusive
           products at the intersection of AI and Application Development.
         </p>
 
         {/* Buttons */}
-        <div data-hero-buttons className="flex flex-wrap gap-4 pt-6">
+        <div className="flex flex-wrap gap-4 pt-4">
           <a
             ref={exploreRef}
             href="#projects"
-            className="magnetic-btn group relative px-8 py-4 bg-white text-bg font-bold rounded-lg overflow-hidden transition-all hover:shadow-neon-cyan"
-            style={{ opacity: 0 }}
+            className="magnetic-btn group relative px-6 py-3 bg-white text-bg font-bold rounded-lg overflow-hidden transition-all hover:shadow-neon-cyan"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan to-neon-purple opacity-0 group-hover:opacity-20 transition-opacity"></div>
             <span className="relative">Explore Systems</span>
@@ -192,13 +155,12 @@ const Hero = () => {
           <a
             ref={contactRef}
             href="#contact"
-            className="magnetic-btn px-8 py-4 border border-white/20 rounded-lg hover:bg-white/5 hover:border-white/40 transition-all font-semibold"
-            style={{ opacity: 0 }}
+            className="magnetic-btn px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5 hover:border-white/40 transition-all font-semibold text-white"
           >
             Initialize Contact
           </a>
         </div>
-      </div>
+      </motion.div>
 
       {/* Right: Avatar with Parallax + Glow */}
       <div
