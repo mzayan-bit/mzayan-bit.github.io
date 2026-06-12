@@ -3,11 +3,25 @@ import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 
 const projects = [
   {
+    title: "VisionTraceAI",
+    tech: ["React", "FastAPI", "Kafka", "YOLO11", "LangGraph"],
+    desc: "Event-driven video analytics platform featuring cross-camera tracking, zero-shot semantic search, and an autonomous agent.",
+    link: "https://github.com/mzayan-bit/VisionTraceAI",
+    img: "/images/visiontraceai.png"
+  },
+  {
     title: "AI Gym Vision",
-    tech: ["Python", "MediaPipe", "YOLO"],
+    tech: ["Python", "MediaPipe", "OpenCV"],
     desc: "Computer vision assistant tracking human pose and calculating joint angles for real-time form correction.",
     link: "https://github.com/mzayan-bit/AI_Gym_Vision",
     img: "/images/ai_gym.png" 
+  },
+  {
+    title: "Matchmaker & Classification Engine",
+    tech: ["Python", "Scikit-Learn", "Pandas", "TF-IDF"],
+    desc: "IPO recommendation engine and KNN classification model utilizing TF-IDF vectorization to map user skill profiles.",
+    link: "https://github.com/mzayan-bit/Decode_Labs_Internship",
+    img: "/images/decodelab.png"
   },
   {
     title: "Roomify",
