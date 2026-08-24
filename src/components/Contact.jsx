@@ -1,11 +1,13 @@
-import { useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import anime from "animejs";
 import { useRipple, prefersReducedMotion, TIMING, EASE } from "../hooks/useMotion";
 
 const Contact = () => {
   const submitRef = useRipple();
   const formRef = useRef(null);
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState({ state: "idle", message: "" }); // 'idle' | 'submitting' | 'success' | 'error'
 
   // Glow on focus for form fields
   useEffect(() => {
@@ -44,7 +46,82 @@ const Contact = () => {
         input.removeEventListener("blur", handleBlur);
       });
     };
-  }, []);
+  }, [status.state]);
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (status.state === "error") {
+      setStatus({ state: "idle", message: "" });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Prevent double submission
+    if (status.state === "submitting") return;
+
+    // Client-side validation for trimmed content
+    const trimmedName = formData.name.trim();
+    const trimmedEmail = formData.email.trim();
+    const trimmedMessage = formData.message.trim();
+
+    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+      setStatus({
+        state: "error",
+        message: "Please fill out all fields with valid information.",
+      });
+      return;
+    }
+
+    // Basic email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setStatus({
+        state: "error",
+        message: "Please provide a valid email address.",
+      });
+      return;
+    }
+
+    setStatus({ state: "submitting", message: "" });
+
+    try {
+      const response = await fetch("https://formspree.io/f/xbdlvber", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: trimmedName,
+          email: trimmedEmail,
+          message: trimmedMessage,
+        }),
+      });
+
+      if (response.ok) {
+        setStatus({
+          state: "success",
+          message: "Transmission received. I will get back to you shortly!",
+        });
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        const data = await response.json();
+        setStatus({
+          state: "error",
+          message:
+            data.errors?.map((err) => err.message).join(", ") ||
+            "Unable to deliver transmission. Please try again or reach out via LinkedIn.",
+        });
+      }
+    } catch (err) {
+      setStatus({
+        state: "error",
+        message: "Network error occurred. Please check your connection and retry.",
+      });
+    }
+  };
 
   return (
     <section id="contact" className="relative py-32 px-6 max-w-4xl mx-auto z-10">
@@ -76,59 +153,115 @@ const Contact = () => {
             architecture, my inbox is open for collaborations.
           </p>
 
-          <form
-            ref={formRef}
-            action="https://formspree.io/f/xbdlvber"
-            method="POST"
-            className="max-w-md mx-auto space-y-5 text-left"
-          >
-            <div>
-              <label className="text-xs font-bold text-muted block mb-2 tracking-widest uppercase">
-                Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                required
-                className="w-full bg-bg/50 border border-white/10 rounded-xl p-4 text-white focus:outline-none transition-all"
-                placeholder="John Doe"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-muted block mb-2 tracking-widest uppercase">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                required
-                className="w-full bg-bg/50 border border-white/10 rounded-xl p-4 text-white focus:outline-none transition-all"
-                placeholder="john@example.com"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-muted block mb-2 tracking-widest uppercase">
-                Message
-              </label>
-              <textarea
-                name="message"
-                rows={4}
-                required
-                className="w-full bg-bg/50 border border-white/10 rounded-xl p-4 text-white focus:outline-none transition-all resize-none"
-                placeholder="Your message here..."
-              />
-            </div>
+          <AnimatePresence mode="wait">
+            {status.state === "success" ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="max-w-md mx-auto p-8 rounded-2xl bg-white/5 border border-neon-cyan/30 text-center space-y-4"
+              >
+                <div className="w-12 h-12 rounded-full bg-neon-cyan/10 border border-neon-cyan text-neon-cyan flex items-center justify-center mx-auto text-xl font-bold">
+                  ✓
+                </div>
+                <h3 className="text-xl font-bold text-white">Transmission Received</h3>
+                <p className="text-muted text-sm leading-relaxed">
+                  {status.message}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setStatus({ state: "idle", message: "" })}
+                  className="mt-4 px-6 py-2.5 rounded-xl border border-white/20 text-white hover:bg-white/10 transition-colors text-sm font-medium"
+                >
+                  Send Another Transmission
+                </button>
+              </motion.div>
+            ) : (
+              <form
+                key="form"
+                ref={formRef}
+                onSubmit={handleSubmit}
+                className="max-w-md mx-auto space-y-5 text-left"
+              >
+                <div>
+                  <label className="text-xs font-bold text-muted block mb-2 tracking-widest uppercase">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    disabled={status.state === "submitting"}
+                    className="w-full bg-bg/50 border border-white/10 rounded-xl p-4 text-white focus:outline-none transition-all disabled:opacity-50"
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted block mb-2 tracking-widest uppercase">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    disabled={status.state === "submitting"}
+                    className="w-full bg-bg/50 border border-white/10 rounded-xl p-4 text-white focus:outline-none transition-all disabled:opacity-50"
+                    placeholder="john@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted block mb-2 tracking-widest uppercase">
+                    Message
+                  </label>
+                  <textarea
+                    name="message"
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    disabled={status.state === "submitting"}
+                    className="w-full bg-bg/50 border border-white/10 rounded-xl p-4 text-white focus:outline-none transition-all resize-none disabled:opacity-50"
+                    placeholder="Your message here..."
+                  />
+                </div>
 
-            <button
-              ref={submitRef}
-              type="submit"
-              className="w-full py-4 mt-4 relative group overflow-hidden rounded-xl font-bold text-bg transition-all hover:scale-[1.02]"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan to-neon-purple transition-all group-hover:opacity-90"></div>
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <span className="relative z-10">Transmit Message</span>
-            </button>
-          </form>
+                {status.state === "error" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs"
+                  >
+                    {status.message}
+                  </motion.div>
+                )}
+
+                <button
+                  ref={submitRef}
+                  type="submit"
+                  disabled={status.state === "submitting"}
+                  className="w-full py-4 mt-4 relative group overflow-hidden rounded-xl font-bold text-bg transition-all hover:scale-[1.02] disabled:opacity-60 disabled:pointer-events-none"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan to-neon-purple transition-all group-hover:opacity-90"></div>
+                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    {status.state === "submitting" ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-bg border-t-transparent rounded-full animate-spin"></span>
+                        Transmitting...
+                      </>
+                    ) : (
+                      "Transmit Message"
+                    )}
+                  </span>
+                </button>
+              </form>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 

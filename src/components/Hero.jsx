@@ -191,6 +191,10 @@ const Hero = () => {
           <img
             src="/me.png"
             alt="Muhammad Zayan"
+            width="420"
+            height="420"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover rounded-full transform group-hover:scale-105 transition-transform duration-700"
             style={{ objectPosition: "50% 30%" }}
           />

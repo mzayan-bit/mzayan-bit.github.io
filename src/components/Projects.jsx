@@ -137,6 +137,8 @@ const ProjectCard = ({ project, setActiveProject }) => {
         <motion.img
           src={project.img}
           alt={project.title}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           style={{ transform: "translateZ(30px)" }}
         />
@@ -183,16 +185,23 @@ const ProjectCard = ({ project, setActiveProject }) => {
 const Projects = () => {
   const [activeProject, setActiveProject] = useState(null);
 
-  // Lock body scroll when modal is open
+  // Lock body scroll and handle Escape key when modal is open
   useEffect(() => {
     if (activeProject) {
       document.body.style.overflow = "hidden";
+      const handleKeyDown = (e) => {
+        if (e.key === "Escape") {
+          setActiveProject(null);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "auto";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
     } else {
       document.body.style.overflow = "auto";
     }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
   }, [activeProject]);
 
   return (
@@ -243,6 +252,9 @@ const Projects = () => {
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-12 pointer-events-none">
               <motion.div
                 layoutId={`card-${activeProject.id}`}
+                role="dialog"
+                aria-modal="true"
+                aria-label={activeProject.title}
                 className="w-full max-w-5xl max-h-full overflow-y-auto bg-card rounded-3xl border border-white/10 shadow-2xl pointer-events-auto flex flex-col custom-scrollbar"
                 style={{ scrollbarWidth: "thin" }}
               >
@@ -252,6 +264,7 @@ const Projects = () => {
                     layoutId={`image-${activeProject.id}`}
                     src={activeProject.img}
                     alt={activeProject.title}
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
