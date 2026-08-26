@@ -80,7 +80,7 @@ const Hero = () => {
 
   return (
     <section
-      id="about"
+      id="hero"
       className="relative min-h-screen flex flex-col md:flex-row items-center justify-center px-6 pt-24 gap-12 max-w-7xl mx-auto overflow-hidden"
     >
       {/* Floating Particles */}
@@ -109,21 +109,19 @@ const Hero = () => {
         className="flex-1 flex flex-col justify-center space-y-4 z-10"
       >
         {/* Pre-heading: Small Label */}
-        <div className="text-xs md:text-sm font-semibold text-muted tracking-[0.2em] uppercase">
+        <div className="text-xs md:text-sm font-semibold text-neon-cyan tracking-[0.2em] uppercase font-mono">
           MUHAMMAD ZAYAN
         </div>
 
         {/* Main Heading */}
-        <h1 className="text-[42px] md:text-[56px] lg:text-[64px] font-extrabold leading-[1.1] tracking-tight text-white">
+        <h1 className="text-[40px] md:text-[56px] lg:text-[62px] font-extrabold leading-[1.1] tracking-tight text-white">
           <span className="block mb-1">Hi, I'm</span>
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple drop-shadow-[0_0_20px_rgba(0,229,255,0.25)] pb-2 min-h-[95px] md:min-h-[125px] lg:min-h-[145px]">
+          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple drop-shadow-[0_0_20px_rgba(0,229,255,0.25)] pb-2 min-h-[90px] md:min-h-[120px] lg:min-h-[140px]">
             <Typewriter
               words={[
                 "Computer Vision Engineer",
-                "AI Engineer",
-                "Machine Learning Developer",
-                "Intelligent Systems Builder",
-                "AI Application Developer"
+                "AI Systems Builder",
+                "Machine Learning Engineer",
               ]}
               loop={0}
               cursor
@@ -137,9 +135,7 @@ const Hero = () => {
 
         {/* Description */}
         <p className="text-[16px] md:text-[18px] text-muted max-w-lg leading-relaxed font-light mt-4">
-          Turning data into decisions at{" "}
-          <b className="text-white">GIKI</b>. I engineer accessible, inclusive
-          products at the intersection of AI and Application Development.
+          Computer Science student at <b className="text-white font-medium">GIKI</b>. I engineer accessible, high-performance visual intelligence systems and end-to-end AI applications with empirical rigor.
         </p>
 
         {/* Buttons */}
@@ -150,7 +146,7 @@ const Hero = () => {
             className="magnetic-btn group relative px-6 py-3 bg-white text-bg font-bold rounded-lg overflow-hidden transition-all hover:shadow-neon-cyan"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan to-neon-purple opacity-0 group-hover:opacity-20 transition-opacity"></div>
-            <span className="relative">Explore Systems</span>
+            <span className="relative">Explore Selected Works</span>
           </a>
           <a
             ref={contactRef}

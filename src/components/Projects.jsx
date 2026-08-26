@@ -196,7 +196,7 @@ const ProjectCard = ({ project, setActiveProject }) => {
           {project.desc}
         </motion.p>
 
-        <motion.div layoutId={`tech-${project.id}`} className="flex flex-wrap gap-2 group-hover:translate-y-[-2px] transition-transform duration-500">
+        <motion.div layoutId={`tech-${project.id}`} className="flex flex-wrap gap-2 group-hover:translate-y-[-2px] transition-transform duration-500 mb-4">
           {project.tech.map((t) => (
             <span
               key={t}
@@ -206,6 +206,11 @@ const ProjectCard = ({ project, setActiveProject }) => {
             </span>
           ))}
         </motion.div>
+
+        <div className="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono text-muted group-hover:text-neon-cyan transition-colors">
+          <span>Explore Architecture</span>
+          <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+        </div>
       </div>
     </motion.div>
   );
@@ -235,27 +240,31 @@ const Projects = () => {
   }, [activeProject]);
 
   return (
-    <section id="projects" className="relative py-32 px-6 max-w-7xl mx-auto z-10">
+    <section id="projects" className="relative py-28 px-6 max-w-7xl mx-auto z-10">
       {/* Section Radial Glow */}
       <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[60vw] h-[40vh] bg-neon-purple/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
-      <div className="mb-20 relative">
-        <motion.h2
+      {/* Section Header */}
+      <div className="mb-16 text-center max-w-2xl mx-auto">
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight"
+          transition={{ duration: 0.7, ease: "easeOut" }}
         >
-          Selected Works
-        </motion.h2>
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: "120px" }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="h-1 bg-gradient-to-r from-white/20 to-white/5 rounded-full shadow-glass-inset"
-        />
+          <span className="text-xs font-mono font-semibold tracking-widest text-neon-cyan uppercase block mb-3">
+            03. Engineering Portfolio
+          </span>
+          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-6">
+            Selected{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple">
+              Works
+            </span>
+          </h2>
+          <p className="text-muted text-base md:text-lg font-light leading-relaxed">
+            Production-grade systems, computer vision workbenches, real-time video intelligence platforms, and MLOps pipelines.
+          </p>
+        </motion.div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">

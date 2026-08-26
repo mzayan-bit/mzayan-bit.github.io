@@ -1,7 +1,11 @@
 import { useState, useCallback } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import About from "./components/About";
+import Interests from "./components/Interests";
 import Projects from "./components/Projects";
+import Experience from "./components/Experience";
+import Skills from "./components/Skills";
 import Contact from "./components/Contact";
 import LoadingScreen from "./components/LoadingScreen";
 import { useParallax, useMaskReveal } from "./hooks/useMotion";
@@ -17,7 +21,7 @@ function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-bg text-white font-sans selection:bg-neon-cyan/30 selection:text-neon-cyan">
+    <div className="relative min-h-screen bg-bg text-white font-sans selection:bg-neon-cyan/30 selection:text-neon-cyan overflow-x-hidden">
       {/* Loading Screen */}
       <LoadingScreen onFinish={handleLoadFinish} />
 
@@ -35,7 +39,11 @@ function App() {
         <Navbar />
         <main>
           <Hero />
+          <About />
+          <Interests />
           <Projects />
+          <Experience />
+          <Skills />
           <Contact />
         </main>
       </div>

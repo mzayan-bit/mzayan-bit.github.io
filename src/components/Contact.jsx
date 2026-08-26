@@ -139,18 +139,20 @@ const Contact = () => {
         <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-96 h-96 bg-neon-purple blur-[150px] opacity-20 pointer-events-none z-0"></div>
 
         <div className="relative z-10">
+          <span className="text-xs font-mono font-semibold tracking-widest text-neon-cyan uppercase block mb-3">
+            06. Communication Channel
+          </span>
           <h2
             data-mask-reveal
-            className="text-4xl md:text-5xl font-extrabold mb-6"
+            className="text-3xl md:text-5xl font-extrabold mb-6 text-white"
           >
             Initialize{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple">
               Connection
             </span>
           </h2>
-          <p className="text-muted text-lg mb-12 max-w-xl mx-auto font-light">
-            Whether you're interested in my computer vision models or full stack
-            architecture, my inbox is open for collaborations.
+          <p className="text-muted text-base md:text-lg mb-12 max-w-xl mx-auto font-light leading-relaxed">
+            Open for research collaborations, engineering opportunities, and technical discussions. Drop a message below or connect directly via LinkedIn.
           </p>
 
           <AnimatePresence mode="wait">
